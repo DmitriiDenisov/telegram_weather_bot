@@ -35,7 +35,7 @@ def echo(update, context):
 
 import os, sys
 
-PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
+PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(PROJECT_PATH)
 f = open(os.path.join(PROJECT_PATH, 'token.txt'), 'r')
 token = f.read(100)
