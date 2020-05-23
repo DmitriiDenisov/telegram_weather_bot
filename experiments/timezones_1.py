@@ -56,6 +56,7 @@ def time_to_tz(t, tz_out):
 def time_to_tz_naive(t, tz_in, tz_out):
     return tz_in.localize(datetime.combine(datetime.today(), t)).astimezone(tz_out).time()
 
+
 print('-----------------')
 t = time(19, 5, 00, 000000)  # pytz.timezone('Asia/Dubai')
 q = time_to_tz_naive(t, pytz.timezone('Asia/Dubai'), pytz.utc)
