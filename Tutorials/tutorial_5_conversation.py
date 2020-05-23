@@ -58,6 +58,15 @@ def gender(update, context):
     return PHOTO
 
 
+def skip_gender(update, context):
+    user = update.message.from_user
+    logger.info("User %s did not send heir gender.", user.first_name)
+    update.message.reply_text('You skipped your gender!')
+    update.message.reply_text('Now send plz your photo')
+
+    return PHOTO
+
+
 def photo(update, context):
     user = update.message.from_user
     photo_file = update.message.photo[-1].get_file()
@@ -154,7 +163,8 @@ def main():
         entry_points=[CommandHandler('start', start)],
 
         states={
-            GENDER: [MessageHandler(Filters.regex('^(Boy|Girl|Other)$'), gender)],
+            GENDER: [MessageHandler(Filters.regex('^(Boy|Girl|Other)$'), gender),
+                     CommandHandler('skip', skip_gender)],
 
             PHOTO: [MessageHandler(Filters.photo, photo),
                     CommandHandler('skip', skip_photo)],
