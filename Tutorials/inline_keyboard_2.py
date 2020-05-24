@@ -109,7 +109,6 @@ def two(update, context):
     )
     return FIRST
 
-
 def three(update, context):
     """Show new choice of buttons"""
     query = update.callback_query
