@@ -4,30 +4,13 @@ import pytz
 import requests
 from telegram import InlineKeyboardButton
 
-from utils.constants import REPLY_MARKUP, TOKENS
-
-url = " https://api.openweathermap.org/data/2.5/weather"
-querystring = \
-    {
-        "appid": TOKENS['curr_weather'],
-        "units": 'metric'
-    }
-
-url_one_call = "https://api.openweathermap.org/data/2.5/onecall"
-querystring_one_call = \
-    {
-        "appid": TOKENS['one_call'],
-        "units": 'metric',
-        "exclude": 'minutely,hourly'
-    }
+from utils.constants import REPLY_MARKUP, URL_CURR_WEATHER, URL_ONE_CALL, PARAMS_ONE_CALL, PARAMS_CURR_WATHER
 
 
 def get_forecast(num_days, chat_id, context):
-    querystring_one_call['lat'] = context.user_data['lat']
-    querystring_one_call['lon'] = context.user_data['lon']
-
-    response = requests.request("GET", url_one_call, params=querystring_one_call)
-
+    PARAMS_ONE_CALL['lat'] = context.user_data['lat']
+    PARAMS_ONE_CALL['lon'] = context.user_data['lon']
+    response = requests.request("GET", URL_ONE_CALL, params=PARAMS_ONE_CALL)
     response = response.json()
     ans = ''
     for i in range(1, num_days + 1):
@@ -35,21 +18,20 @@ def get_forecast(num_days, chat_id, context):
         ans += f'{day}: Temp: {response["daily"][i]["temp"]["day"]}, Feels like {response["daily"][i]["feels_like"]["day"]}\n'
 
     # ans += f'Humidity: {response["daily"][0]["humidity"]}\n'
-
     context.bot.send_message(chat_id=chat_id, text=ans)
 
 
 def get_current_weather(update, city: str):
-    querystring['q'] = city
-    response = requests.request("GET", url, params=querystring)
+    PARAMS_CURR_WATHER['q'] = city
+    response = requests.request("GET", URL_CURR_WEATHER, params=PARAMS_CURR_WATHER)
     main = response.json()['main']
     update.message.reply_text(
         f'Current temp: {main["temp"]}, feels like: {main["feels_like"]}, humidity: {main["humidity"]}')
 
 
 def get_current_weather_inline(city: str):
-    querystring['q'] = city
-    response = requests.request("GET", url, params=querystring)
+    PARAMS_CURR_WATHER['q'] = city
+    response = requests.request("GET", URL_CURR_WEATHER, params=PARAMS_CURR_WATHER)
     try:
         a = response.json()["main"]["temp"]
         # return 'HALLO!'
@@ -66,10 +48,10 @@ def get_inline_keyboard():
 
 
 def get_timezone(lat, lon):
-    url = "https://api.openweathermap.org/data/2.5/onecall"
-    querystring = {"lat": lat, "lon": lon, "appid": TOKENS['one_call'],
-                   "units": 'metric', "exclude": 'minutely,hourly,daily'}
-    response = requests.request("GET", url, params=querystring)
+    PARAMS_ONE_CALL['lat'] = lat
+    PARAMS_ONE_CALL['lon'] = lon
+    PARAMS_ONE_CALL['exclude'] = 'minutely,hourly,daily'
+    response = requests.request("GET", URL_ONE_CALL, params=PARAMS_ONE_CALL)
 
     user_tz = pytz.timezone(response.json()['timezone'])
     return user_tz
