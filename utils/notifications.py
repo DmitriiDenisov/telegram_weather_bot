@@ -60,6 +60,7 @@ def notif_func_forecast(context: CallbackContext):
 
     PARAMS_ONE_CALL['lat'] = lat
     PARAMS_ONE_CALL['lon'] = lon
+    PARAMS_ONE_CALL['exclude'] = 'minutely,hourly'
 
     response = requests.request("GET", URL_ONE_CALL, params=PARAMS_ONE_CALL)
     modes = ['temp', 'feels_like']
