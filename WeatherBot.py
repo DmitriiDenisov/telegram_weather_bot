@@ -101,7 +101,7 @@ class WeatherBot:
 
     def forecasts(self, update, context):
         if update.message.text == CURRENT_WEATHER:
-            get_current_weather(update, context.user_data['location'])
+            get_current_weather(update, context.user_data)
         elif update.message.text == FORECASTS_3_DAYS:
             get_forecast(3, update.message.chat_id, context)
         elif update.message.text == FORECASTS_5_DAYS:

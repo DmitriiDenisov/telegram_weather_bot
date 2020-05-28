@@ -10,6 +10,7 @@ from utils.constants import REPLY_MARKUP, URL_CURR_WEATHER, URL_ONE_CALL, PARAMS
 def get_forecast(num_days, chat_id, context):
     PARAMS_ONE_CALL['lat'] = context.user_data['lat']
     PARAMS_ONE_CALL['lon'] = context.user_data['lon']
+    PARAMS_ONE_CALL["exclude"] = 'minutely,hourly'
     response = requests.request("GET", URL_ONE_CALL, params=PARAMS_ONE_CALL)
     response = response.json()
     ans = ''
@@ -21,8 +22,10 @@ def get_forecast(num_days, chat_id, context):
     context.bot.send_message(chat_id=chat_id, text=ans)
 
 
-def get_current_weather(update, city: str):
-    PARAMS_CURR_WATHER['q'] = city
+def get_current_weather(update, user_data):
+    # PARAMS_CURR_WATHER['q'] = city
+    PARAMS_CURR_WATHER['lat'] = user_data['lat']
+    PARAMS_CURR_WATHER['lon'] = user_data['lon']
     response = requests.request("GET", URL_CURR_WEATHER, params=PARAMS_CURR_WATHER)
     main = response.json()['main']
     update.message.reply_text(
