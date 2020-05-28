@@ -272,7 +272,7 @@ def error(update, context):
     logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
-f = open('../token.txt', 'r')
+f = open('../tokens.json', 'r')
 token = f.read(100)
 
 def main():

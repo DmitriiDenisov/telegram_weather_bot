@@ -1,7 +1,9 @@
+import requests
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
+from telegram.ext import CallbackContext
 
-from utils.constants import d_symbols
-from utils.queue import rem_notif, set_notif, notif_func_forecast
+from utils.constants import d_symbols, TOKENS
+from utils.queue import rem_notif, set_notif
 
 
 def call_notifications_menu(update, context):
@@ -49,3 +51,26 @@ def notifications_menu(update, context):
         text="I will send you daily weather info based on chosen time",
         reply_markup=reply_markup
     )
+
+def notif_func_forecast(context: CallbackContext):
+    chat_id = context.job.context['chat_id']
+    lat = context.job.context['lat']
+    lon = context.job.context['lon']
+    url = "https://api.openweathermap.org/data/2.5/onecall"
+    querystring = {"lat": lat, "lon": lon, "appid": TOKENS['one_call'],
+                   "units": 'metric', "exclude": 'minutely,hourly'}
+    response = requests.request("GET", url, params=querystring)
+
+    modes = ['temp', 'feels_like']
+
+    response = response.json()
+    ans = 'Hey! Here is your forecast for today: \n'
+    for mode in modes:
+        if mode == 'temp':
+            ans += f'Temp: {response["daily"][0][mode]["day"]}\n'
+        else:
+            ans += f'Feels like: {response["daily"][0][mode]["day"]}\n'
+
+    ans += f'Humidity: {response["daily"][0]["humidity"]}\n'
+
+    context.bot.send_message(chat_id=chat_id, text=ans)

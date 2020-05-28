@@ -2,7 +2,7 @@ import os
 
 from WeatherBot import WeatherBot
 
-f = open('token.txt', 'r')
+f = open('tokens.json', 'r')
 token = f.read(100)
 
 

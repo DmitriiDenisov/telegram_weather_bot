@@ -1,4 +1,10 @@
 from telegram import ReplyKeyboardMarkup
+import json
+
+tokens_path = 'tokens.json'
+
+with open(tokens_path) as json_file:
+    TOKENS = json.load(json_file)
 
 d_symbols = {'✅': '🛑', '🛑': '✅'}
 CHOOSING = 0

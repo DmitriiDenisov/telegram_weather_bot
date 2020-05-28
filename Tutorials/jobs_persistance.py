@@ -4,7 +4,7 @@ from datetime import timedelta
 
 from telegram.ext import Updater, Job, PicklePersistence, CallbackContext
 
-f = open('../token.txt', 'r')
+f = open('../tokens.json', 'r')
 token = f.read(100)
 JOBS_PICKLE = 'job_tuples.pickle'
 

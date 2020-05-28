@@ -7,7 +7,7 @@ import time
 
 PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(PROJECT_PATH)
-f = open(os.path.join(PROJECT_PATH, 'token.txt'), 'r')
+f = open(os.path.join(PROJECT_PATH, 'tokens.json'), 'r')
 token = f.read(100)
 
 updater = Updater(token, use_context=True)
