@@ -2,8 +2,9 @@ import requests
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CallbackContext
 
-from utils.constants import d_symbols, URL_ONE_CALL, PARAMS_ONE_CALL
+from utils.constants import URL_ONE_CALL, PARAMS_ONE_CALL, D_SYMBOLS
 from utils.queue import rem_notif, set_notif
+from utils.utils import get_minutes_keyboard
 
 
 def call_notifications_menu(update, context):
@@ -15,11 +16,13 @@ def call_notifications_menu(update, context):
     :return:
     """
     inline_keyboard = context.user_data['inline_keyboard']
-    for notif in context.user_data['notifs']:
-        inline_keyboard[notif.hour // 4][notif.hour % 4].text = '✅' + inline_keyboard[notif.hour // 4][
-                                                                          notif.hour % 4].text[1:]
+    for hour in context.user_data['notifs'].keys():
+        hour_int = int(hour)
+        inline_keyboard[hour_int // 4][hour_int % 4].text = '✅' + inline_keyboard[hour_int // 4][
+                                                                      hour_int % 4].text[1:]
     reply_markup = InlineKeyboardMarkup(inline_keyboard)
     update.message.reply_text(f'I will send you daily weather info based on chosen time', reply_markup=reply_markup)
+    return 0
 
 
 def notifications_menu(update, context):
@@ -37,20 +40,62 @@ def notifications_menu(update, context):
     chat_id = update.effective_chat.id
     inline_keyboard = context.user_data['inline_keyboard']
     num = int(query.data)
-    new_s = d_symbols[inline_keyboard[num // 4][num % 4].text[0]]
-    if new_s == '🛑':
-        rem_notif(chat_id, f"{num}:00".zfill(2), context)
-    else:
-        set_notif(chat_id, f"{num}:00".zfill(2), context, notif_func_forecast)
+    t = f"{query.data.zfill(2)}:00"
 
-    inline_keyboard[num // 4][num % 4] = InlineKeyboardButton(f'{new_s}{f"{num}:00".zfill(2)}',
-                                                              callback_data=num)
+    minutes_keyboard = get_minutes_keyboard(num)
 
-    reply_markup = InlineKeyboardMarkup(inline_keyboard)
+    for idx in context.user_data['notifs'][query.data]:
+        minutes_keyboard[idx // 4][idx % 4].text = '✅' + minutes_keyboard[idx // 4][idx % 4].text[1:]
+
+    reply_markup = InlineKeyboardMarkup(minutes_keyboard)
     query.edit_message_text(
         text="I will send you daily weather info based on chosen time",
         reply_markup=reply_markup
     )
+    return 1
+
+
+def test_func(update, context):
+    query = update.callback_query
+    minutes = query.message.reply_markup.inline_keyboard
+    query.answer()
+    chat_id = update.effective_chat.id
+    data_str = query.data
+
+    if data_str == '-1':
+        inline_keyboard = context.user_data['inline_keyboard']
+        reply_markup = InlineKeyboardMarkup(inline_keyboard)
+        query.edit_message_text(f'I will send you daily weather info based on chosen time', reply_markup=reply_markup)
+        return 0
+    idx = int(data_str)
+
+    prev = minutes[idx // 4][idx % 4].text
+    hour = str(int(prev[1:3]))  # берем ток час
+    new_s = D_SYMBOLS[prev[0]]
+
+    if new_s == '🛑':
+        context.user_data['notifs'][hour].remove(idx)
+        if not context.user_data['notifs'][hour]:
+            # Remove from main_keyboard
+            hour_int = int(hour)
+            temp = context.user_data['inline_keyboard'][hour_int // 4][hour_int % 4]
+            context.user_data['inline_keyboard'][hour_int // 4][hour_int % 4].text = new_s + temp.text[1:]
+        # rem_notif(chat_id, t, context)
+    else:
+        hour_int = int(hour)
+        temp = context.user_data['inline_keyboard'][hour_int // 4][hour_int % 4]
+        context.user_data['inline_keyboard'][hour_int // 4][hour_int % 4].text = new_s + temp.text[1:]
+        # set_notif(chat_id, t, context, notif_func_forecast, hour)
+        context.user_data['notifs'][hour].add(idx)  # внимание! хранятся индексы!!!
+
+    minutes[idx // 4][idx % 4] = InlineKeyboardButton(new_s + prev[1:], callback_data=data_str)
+
+    reply_markup = InlineKeyboardMarkup(minutes)
+    query.edit_message_text(
+        text="I will send you daily weather info based on chosen time",
+        reply_markup=reply_markup
+    )
+    return 1
 
 
 def notif_func_forecast(context: CallbackContext):

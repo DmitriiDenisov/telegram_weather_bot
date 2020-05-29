@@ -4,7 +4,7 @@ import pytz
 import requests
 from telegram import InlineKeyboardButton
 
-from utils.constants import REPLY_MARKUP, URL_CURR_WEATHER, URL_ONE_CALL, PARAMS_ONE_CALL, PARAMS_CURR_WATHER
+from utils.constants import URL_CURR_WEATHER, URL_ONE_CALL, PARAMS_ONE_CALL, PARAMS_CURR_WATHER, REPLY_MARKUP
 
 
 def get_forecast(num_days, chat_id, context):
@@ -43,13 +43,6 @@ def get_current_weather_inline(city: str):
         return 'ERROR'
 
 
-def get_inline_keyboard():
-    inline_keyboard = [[] for x in range(6)]
-    for k, i in enumerate(range(24)):
-        inline_keyboard[k // 4].append(InlineKeyboardButton(f'🛑{f"{i}".zfill(2)}:00', callback_data=k))
-    return inline_keyboard
-
-
 def get_timezone(lat, lon):
     PARAMS_ONE_CALL['lat'] = lat
     PARAMS_ONE_CALL['lon'] = lon
@@ -58,6 +51,16 @@ def get_timezone(lat, lon):
 
     user_tz = pytz.timezone(response.json()['timezone'])
     return user_tz
+
+
+def get_minutes_keyboard(num):
+    minutes_keyboard = [[] for x in range(6)]
+    minutes = [str(3 * el) for el in list(range(20))]
+    hour = f"{num}".zfill(2)
+    for k in range(20):
+        minutes_keyboard[k // 4].append(InlineKeyboardButton(f"🛑{hour}:{minutes[k].zfill(2)}", callback_data=k))
+    minutes_keyboard[-1].append(InlineKeyboardButton(f'Back', callback_data=-1))
+    return minutes_keyboard
 
 
 def send_keyboard(update, context):

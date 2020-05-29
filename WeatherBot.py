@@ -1,19 +1,21 @@
 # https://t.me/weather_fcst_bot
 
 import logging
+from collections import defaultdict
+
 from telegram import ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import CallbackQueryHandler, ConversationHandler, MessageHandler, Filters, \
     PicklePersistence
 
 from telegram.ext import Updater, InlineQueryHandler, CommandHandler
-from utils.constants import LOCATION, CANCEL, NOTIFICATIONS, REPLY_MARKUP, CURRENT_WEATHER, FORECASTS_3_DAYS, \
-    FORECASTS_5_DAYS, CHANGE_LOC, TOKENS
+from utils.constants import LOCATION, CANCEL, NOTIFICATIONS, CURRENT_WEATHER, FORECASTS_3_DAYS, \
+    FORECASTS_5_DAYS, CHANGE_LOC, TOKENS, REPLY_MARKUP, INLINE_MAIN_KEYBOARD
 from utils.inline_queries import inlinequeries
 from utils.locations import location_lat_lon, cancel, location_typing, call_change_location
-from utils.notifications import call_notifications_menu, notifications_menu, notif_func_forecast
+from utils.notifications import call_notifications_menu, notifications_menu, notif_func_forecast, test_func
 from utils.queue import recover_queue, rem_notif
 
-from utils.utils import get_current_weather, get_inline_keyboard, get_forecast, send_keyboard
+from utils.utils import get_current_weather, get_forecast, send_keyboard
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -28,7 +30,8 @@ class WeatherBot:
         self.jobQueue = updater.job_queue
         dp = updater.dispatcher
 
-        recover_queue(updater.persistence.user_data, self.jobQueue, notif_func_forecast)
+        # TODO: uncomment and fix for minutes
+        # recover_queue(updater.persistence.user_data, self.jobQueue, notif_func_forecast)
 
         start_conv = ConversationHandler(
             entry_points=[CommandHandler('start', self.start)],
@@ -50,23 +53,33 @@ class WeatherBot:
                     MessageHandler(Filters.regex(f'^({CANCEL})$'), cancel),
                     MessageHandler(Filters.text, location_typing)]
             },
-
+            fallbacks=[]
+        )
+        notif_conv = ConversationHandler(
+            entry_points=[MessageHandler(Filters.regex(f'^({NOTIFICATIONS})$'), call_notifications_menu)],
+            states={
+                0: [CallbackQueryHandler(notifications_menu, pattern='^[0-9]+$')],
+                1: [CallbackQueryHandler(test_func, pattern='^-?[0-9]+$')]
+            },
             fallbacks=[]
         )
         # Add handlers for location and start
         dp.add_handler(loc_conv)
         dp.add_handler(start_conv)
+        dp.add_handler(notif_conv)
 
         # Forecasts menu
         dp.add_handler(
             MessageHandler(Filters.regex(f"^({CURRENT_WEATHER}|{FORECASTS_3_DAYS}|{FORECASTS_5_DAYS})$"),
                            self.forecasts))
 
+        """
         # Notifications
         dp.add_handler(
             MessageHandler(Filters.regex(f'^({NOTIFICATIONS})$'), call_notifications_menu))
         # handler for Notifications inline
         dp.add_handler(CallbackQueryHandler(notifications_menu, pattern='^[0-9]+$'))
+        """
 
         # For inline queries
         dp.add_handler(InlineQueryHandler(inlinequeries))
@@ -86,12 +99,12 @@ class WeatherBot:
         first_name = update.effective_user.first_name
         update.message.reply_text(f'Hi {first_name}!')
 
-        context.user_data['inline_keyboard'] = get_inline_keyboard()
+        context.user_data['inline_keyboard'] = INLINE_MAIN_KEYBOARD[:] # copy
         # remove all existing jobs for thus user
         list_times = context.user_data.get('notifs', [])[:]  # to make a copy
         for t in list_times:
             rem_notif(update.message.chat_id, t.strftime("%H:%M"), context)
-        context.user_data['notifs'] = []
+        context.user_data['notifs'] = defaultdict(set)
 
         location_keyboard = KeyboardButton(text="📍 Send Location", request_location=True)
         custom_keyboard = [[location_keyboard]]
