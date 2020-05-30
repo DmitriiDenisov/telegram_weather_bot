@@ -36,7 +36,7 @@ def update_queue(chat_id, context, callback_func):
     :param callback_daily:
     :return:
     """
-    for hour, minutes in context.user_data.get('notifs').items():
+    for hour, minutes in context.user_data.get('notifs', {}).items():
         for minute in minutes:
             # Delete previous jobs:
             time = f'{hour}:{str(minute * 3).zfill(2)}'
