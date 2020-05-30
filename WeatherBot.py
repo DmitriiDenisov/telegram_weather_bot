@@ -155,9 +155,11 @@ class WeatherBot:
     def error(self, update, context):
         """Log Errors caused by Updates."""
         chat_id = update.message.chat_id
-        if not self.updater.persistence.user_data.get(chat_id):
+        if not self.updater.persistence.user_data.get(chat_id).get('notifs'):
             update.message.reply_text('Please start the bot again by typing /start')
-        logger.warning('Update "%s" caused error "%s"', update, context.error)
+        # update.message.text
+        logger.warning(f'Message {update.message.text} caused error {context.error} \
+        Date: {update.message.date}')
 
 
 def main():
