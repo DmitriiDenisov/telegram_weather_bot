@@ -75,17 +75,21 @@ def test_func(update, context):
 
     if new_s == '🛑':
         context.user_data['notifs'][hour].remove(idx)
+        # if we removed all notifs from current hour
         if not context.user_data['notifs'][hour]:
+            context.user_data['notifs'].pop(hour, None)
             # Remove from main_keyboard
             hour_int = int(hour)
             temp = context.user_data['inline_keyboard'][hour_int // 4][hour_int % 4]
             context.user_data['inline_keyboard'][hour_int // 4][hour_int % 4].text = new_s + temp.text[1:]
-        # rem_notif(chat_id, t, context)
+            t = f'{hour}:{str(idx * 3).zfill(2)}'
+            rem_notif(chat_id, t, context)
     else:
         hour_int = int(hour)
         temp = context.user_data['inline_keyboard'][hour_int // 4][hour_int % 4]
         context.user_data['inline_keyboard'][hour_int // 4][hour_int % 4].text = new_s + temp.text[1:]
-        # set_notif(chat_id, t, context, notif_func_forecast, hour)
+        t = f'{hour}:{str(idx * 3).zfill(2)}'
+        set_notif(chat_id, t, context, notif_func_forecast)
         context.user_data['notifs'][hour].add(idx)  # внимание! хранятся индексы!!!
 
     minutes[idx // 4][idx % 4] = InlineKeyboardButton(new_s + prev[1:], callback_data=data_str)

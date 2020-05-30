@@ -101,7 +101,7 @@ class WeatherBot:
 
         context.user_data['inline_keyboard'] = INLINE_MAIN_KEYBOARD[:] # copy
         # remove all existing jobs for thus user
-        list_times = context.user_data.get('notifs', [])[:]  # to make a copy
+        list_times = context.user_data.get('notifs', [])  # TODO: understand if need a copy
         for t in list_times:
             rem_notif(update.message.chat_id, t.strftime("%H:%M"), context)
         context.user_data['notifs'] = defaultdict(set)

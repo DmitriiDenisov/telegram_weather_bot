@@ -9,8 +9,6 @@ def get_inline_main_keyboard():
     return inline_keyboard
 
 
-
-
 tokens_path = 'tokens.json'
 
 with open(tokens_path) as json_file:

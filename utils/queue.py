@@ -62,7 +62,7 @@ def rem_notif(chat_id, time, context):
     :return:
     """
     t = datetime.strptime(time, '%H:%M').time()
-    context.user_data['notifs'].remove(t)
+    # context.user_data['notifs'][hour_int].remove(t)
 
     for old_job in context.job_queue.get_jobs_by_name(f"{chat_id}_{t.strftime('%H:%M')}"):
         old_job.enabled = False  # Temporarily disable this job
@@ -80,7 +80,7 @@ def set_notif(chat_id, time, context, callback_daily):
     user_data = context.user_data
     t = datetime.strptime(time, '%H:%M').time()
 
-    user_data['notifs'].append(t)
+    # user_data['notifs'][hour].add(t)
     user_tz = user_data['timezone']
 
     if datetime.now().astimezone(pytz.utc) > (user_tz).localize(
