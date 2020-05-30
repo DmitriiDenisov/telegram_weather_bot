@@ -26,11 +26,11 @@ logger = logging.getLogger(__name__)
 class WeatherBot:
     def __init__(self, token):
         my_persistence = PicklePersistence(filename='data_storage')
-        updater = Updater(token, persistence=my_persistence, use_context=True)
-        self.jobQueue = updater.job_queue
-        dp = updater.dispatcher
+        self.updater = Updater(token, persistence=my_persistence, use_context=True)
+        self.jobQueue = self.updater.job_queue
+        dp = self.updater.dispatcher
 
-        recover_queue(updater.persistence.user_data, self.jobQueue, notif_func_forecast)
+        recover_queue(self.updater.persistence.user_data, self.jobQueue, notif_func_forecast)
 
         start_conv = ConversationHandler(
             entry_points=[CommandHandler('start', self.start)],
@@ -72,7 +72,6 @@ class WeatherBot:
             MessageHandler(Filters.regex(f"^({CURRENT_WEATHER}|{FORECASTS_3_DAYS}|{FORECASTS_5_DAYS})$"),
                            self.forecasts))
 
-
         # Notifications
         dp.add_handler(
             MessageHandler(Filters.regex(f'^({NOTIFICATIONS})$'), call_notifications_menu))
@@ -80,7 +79,6 @@ class WeatherBot:
         dp.add_handler(CallbackQueryHandler(notifications_menu, pattern='^[0-9]+$'))
         dp.add_handler(CallbackQueryHandler(test_func, pattern='^m[0-9]+|mback$'))
         # dp.add_handler(CallbackQueryHandler(test_func, pattern='^[0-9]+$'))
-
 
         # For inline queries
         dp.add_handler(InlineQueryHandler(inlinequeries))
@@ -93,17 +91,16 @@ class WeatherBot:
         dp.add_error_handler(self.error)
 
         # Start pooling
-        updater.start_polling()
-        updater.idle()
+        self.updater.start_polling()
+        self.updater.idle()
 
     def start(self, update, context):
         first_name = update.effective_user.first_name
         update.message.reply_text(f'Hi {first_name}!')
 
-        context.user_data['inline_keyboard'] = INLINE_MAIN_KEYBOARD[:] # copy
+        context.user_data['inline_keyboard'] = INLINE_MAIN_KEYBOARD[:]  # copy
         # remove all existing jobs for thus user
-        list_times = context.user_data.get('notifs', [])  # TODO: understand if need a copy
-        for hour, minutes in context.user_data.get('notifs').items():
+        for hour, minutes in context.user_data.get('notifs', {}).items():
             for minute in minutes:
                 time = f'{hour}:{str(minute * 3).zfill(2)}'
                 rem_notif(update.message.chat_id, time, context)
@@ -157,6 +154,9 @@ class WeatherBot:
 
     def error(self, update, context):
         """Log Errors caused by Updates."""
+        chat_id = update.message.chat_id
+        if not self.updater.persistence.user_data.get(chat_id):
+            update.message.reply_text('Please start the bot again by typing /start')
         logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 

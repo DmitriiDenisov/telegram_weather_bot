@@ -12,7 +12,7 @@ def recover_queue(users_data, jobQueue, callback_func):
     :return:
     """
     for chat_id, user in users_data.items():
-        for hour, minutes in user.get('notifs').items():
+        for hour, minutes in user.get('notifs', {}).items():
             for minute in minutes:
                 t = datetime.strptime(f'{hour}:{3 * minute}', '%H:%M').time()
                 if datetime.now().astimezone(pytz.utc) > (user['timezone']).localize(
