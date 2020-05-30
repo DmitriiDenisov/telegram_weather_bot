@@ -17,9 +17,11 @@ def call_notifications_menu(update, context):
     """
     inline_keyboard = context.user_data['inline_keyboard']
     for hour in context.user_data['notifs'].keys():
-        hour_int = int(hour)
-        inline_keyboard[hour_int // 4][hour_int % 4].text = '✅' + inline_keyboard[hour_int // 4][
-                                                                      hour_int % 4].text[1:]
+        # in case we have empty set: {'key': set()}
+        if context.user_data['notifs'][hour]:
+            hour_int = int(hour)
+            inline_keyboard[hour_int // 4][hour_int % 4].text = '✅' + inline_keyboard[hour_int // 4][
+                                                                          hour_int % 4].text[1:]
     reply_markup = InlineKeyboardMarkup(inline_keyboard)
     update.message.reply_text(f'I will send you daily weather info based on chosen time', reply_markup=reply_markup)
     return 0
@@ -45,6 +47,7 @@ def notifications_menu(update, context):
     minutes_keyboard = get_minutes_keyboard(num)
 
     for idx in context.user_data['notifs'][query.data]:
+        # if len()
         minutes_keyboard[idx // 4][idx % 4].text = '✅' + minutes_keyboard[idx // 4][idx % 4].text[1:]
 
     reply_markup = InlineKeyboardMarkup(minutes_keyboard)
@@ -62,12 +65,12 @@ def test_func(update, context):
     chat_id = update.effective_chat.id
     data_str = query.data
 
-    if data_str == '-1':
+    if data_str == 'mback':
         inline_keyboard = context.user_data['inline_keyboard']
         reply_markup = InlineKeyboardMarkup(inline_keyboard)
         query.edit_message_text(f'I will send you daily weather info based on chosen time', reply_markup=reply_markup)
         return 0
-    idx = int(data_str)
+    idx = int(data_str[1:])
 
     prev = minutes[idx // 4][idx % 4].text
     hour = str(int(prev[1:3]))  # берем ток час
@@ -82,8 +85,8 @@ def test_func(update, context):
             hour_int = int(hour)
             temp = context.user_data['inline_keyboard'][hour_int // 4][hour_int % 4]
             context.user_data['inline_keyboard'][hour_int // 4][hour_int % 4].text = new_s + temp.text[1:]
-            t = f'{hour}:{str(idx * 3).zfill(2)}'
-            rem_notif(chat_id, t, context)
+        t = f'{hour}:{str(idx * 3).zfill(2)}'
+        rem_notif(chat_id, t, context)
     else:
         hour_int = int(hour)
         temp = context.user_data['inline_keyboard'][hour_int // 4][hour_int % 4]

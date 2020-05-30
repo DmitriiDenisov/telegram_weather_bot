@@ -58,8 +58,10 @@ def get_minutes_keyboard(num):
     minutes = [str(3 * el) for el in list(range(20))]
     hour = f"{num}".zfill(2)
     for k in range(20):
-        minutes_keyboard[k // 4].append(InlineKeyboardButton(f"🛑{hour}:{minutes[k].zfill(2)}", callback_data=k))
-    minutes_keyboard[-1].append(InlineKeyboardButton(f'Back', callback_data=-1))
+        minute = minutes[k].zfill(2)
+        minutes_keyboard[k // 4].append(InlineKeyboardButton(f"🛑{hour}:{minute}",
+                                                             callback_data=f"m{k}"))
+    minutes_keyboard[-1].append(InlineKeyboardButton(f'Back', callback_data='mback'))
     return minutes_keyboard
 
 

@@ -30,8 +30,7 @@ class WeatherBot:
         self.jobQueue = updater.job_queue
         dp = updater.dispatcher
 
-        # TODO: uncomment and fix for minutes
-        # recover_queue(updater.persistence.user_data, self.jobQueue, notif_func_forecast)
+        recover_queue(updater.persistence.user_data, self.jobQueue, notif_func_forecast)
 
         start_conv = ConversationHandler(
             entry_points=[CommandHandler('start', self.start)],
@@ -66,20 +65,22 @@ class WeatherBot:
         # Add handlers for location and start
         dp.add_handler(loc_conv)
         dp.add_handler(start_conv)
-        dp.add_handler(notif_conv)
+        # dp.add_handler(notif_conv)
 
         # Forecasts menu
         dp.add_handler(
             MessageHandler(Filters.regex(f"^({CURRENT_WEATHER}|{FORECASTS_3_DAYS}|{FORECASTS_5_DAYS})$"),
                            self.forecasts))
 
-        """
+
         # Notifications
         dp.add_handler(
             MessageHandler(Filters.regex(f'^({NOTIFICATIONS})$'), call_notifications_menu))
         # handler for Notifications inline
         dp.add_handler(CallbackQueryHandler(notifications_menu, pattern='^[0-9]+$'))
-        """
+        dp.add_handler(CallbackQueryHandler(test_func, pattern='^m[0-9]+|mback$'))
+        # dp.add_handler(CallbackQueryHandler(test_func, pattern='^[0-9]+$'))
+
 
         # For inline queries
         dp.add_handler(InlineQueryHandler(inlinequeries))
@@ -102,8 +103,10 @@ class WeatherBot:
         context.user_data['inline_keyboard'] = INLINE_MAIN_KEYBOARD[:] # copy
         # remove all existing jobs for thus user
         list_times = context.user_data.get('notifs', [])  # TODO: understand if need a copy
-        for t in list_times:
-            rem_notif(update.message.chat_id, t.strftime("%H:%M"), context)
+        for hour, minutes in context.user_data.get('notifs').items():
+            for minute in minutes:
+                time = f'{hour}:{str(minute * 3).zfill(2)}'
+                rem_notif(update.message.chat_id, time, context)
         context.user_data['notifs'] = defaultdict(set)
 
         location_keyboard = KeyboardButton(text="📍 Send Location", request_location=True)
@@ -127,8 +130,25 @@ class WeatherBot:
                                  reply_markup=REPLY_MARKUP)
 
     def get(self, update, context):
+        chat_id = str(update.message.chat_id)
         key = update.message.text.partition(' ')[2]
 
+        if key == 'jobs':
+            ans = ''
+            jobs = context.job_queue.jobs()
+            for job in jobs:
+                if job.name.startswith(chat_id):
+                    tz = str(job.tzinfo)
+                    rem = str(job.removed)
+                    name = str(str(job.name).split('_')[1])
+                    next_t = str(job.next_t)
+                    ans += f'Name: {name}\n Tz info: {tz}\n rem: {rem}\n nex_t: {next_t}\n'
+                    ans += '-------------------------\n'
+            if ans:
+                update.message.reply_text(ans)
+            else:
+                update.message.reply_text('Queue is empty!')
+            return True
         value = context.user_data.get(key)
         if value:
             update.message.reply_text(value)
