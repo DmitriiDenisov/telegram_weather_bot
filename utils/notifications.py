@@ -27,7 +27,7 @@ def call_notifications_menu(update, context):
     return 0
 
 
-def notifications_menu(update, context):
+def hour_notif_menu(update, context):
     """
     Gets response from user and either removes notification from jobQueue or sets new notification
     Replies to user with updated inline keyboard
@@ -39,11 +39,7 @@ def notifications_menu(update, context):
     """
     query = update.callback_query
     query.answer()
-    chat_id = update.effective_chat.id
-    inline_keyboard = context.user_data['inline_keyboard']
     num = int(query.data)
-    t = f"{query.data.zfill(2)}:00"
-
     minutes_keyboard = get_minutes_keyboard(num)
 
     for idx in context.user_data['notifs'][query.data]:
@@ -58,7 +54,7 @@ def notifications_menu(update, context):
     return 1
 
 
-def test_func(update, context):
+def mins_notif_menu(update, context):
     query = update.callback_query
     minutes = query.message.reply_markup.inline_keyboard
     query.answer()
@@ -73,7 +69,7 @@ def test_func(update, context):
     idx = int(data_str[1:])
 
     prev = minutes[idx // 4][idx % 4].text
-    hour = str(int(prev[1:3]))  # берем ток час
+    hour = str(int(prev[1:3]))  # take only hour
     new_s = D_SYMBOLS[prev[0]]
 
     if new_s == '🛑':
@@ -93,7 +89,7 @@ def test_func(update, context):
         context.user_data['inline_keyboard'][hour_int // 4][hour_int % 4].text = new_s + temp.text[1:]
         t = f'{hour}:{str(idx * 3).zfill(2)}'
         set_notif(chat_id, t, context, notif_func_forecast)
-        context.user_data['notifs'][hour].add(idx)  # внимание! хранятся индексы!!!
+        context.user_data['notifs'][hour].add(idx)  # attention! we store indecies!!!
 
     minutes[idx // 4][idx % 4] = InlineKeyboardButton(new_s + prev[1:], callback_data=data_str)
 

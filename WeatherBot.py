@@ -12,7 +12,7 @@ from utils.constants import LOCATION, CANCEL, NOTIFICATIONS, CURRENT_WEATHER, FO
     FORECASTS_5_DAYS, CHANGE_LOC, TOKENS, REPLY_MARKUP, INLINE_MAIN_KEYBOARD
 from utils.inline_queries import inlinequeries
 from utils.locations import location_lat_lon, cancel, location_typing, call_change_location
-from utils.notifications import call_notifications_menu, notifications_menu, notif_func_forecast, test_func
+from utils.notifications import call_notifications_menu, hour_notif_menu, notif_func_forecast, mins_notif_menu
 from utils.queue import recover_queue, rem_notif
 
 from utils.utils import get_current_weather, get_forecast, send_keyboard
@@ -54,14 +54,6 @@ class WeatherBot:
             },
             fallbacks=[]
         )
-        notif_conv = ConversationHandler(
-            entry_points=[MessageHandler(Filters.regex(f'^({NOTIFICATIONS})$'), call_notifications_menu)],
-            states={
-                0: [CallbackQueryHandler(notifications_menu, pattern='^[0-9]+$')],
-                1: [CallbackQueryHandler(test_func, pattern='^-?[0-9]+$')]
-            },
-            fallbacks=[]
-        )
         # Add handlers for location and start
         dp.add_handler(loc_conv)
         dp.add_handler(start_conv)
@@ -76,9 +68,8 @@ class WeatherBot:
         dp.add_handler(
             MessageHandler(Filters.regex(f'^({NOTIFICATIONS})$'), call_notifications_menu))
         # handler for Notifications inline
-        dp.add_handler(CallbackQueryHandler(notifications_menu, pattern='^[0-9]+$'))
-        dp.add_handler(CallbackQueryHandler(test_func, pattern='^m[0-9]+|mback$'))
-        # dp.add_handler(CallbackQueryHandler(test_func, pattern='^[0-9]+$'))
+        dp.add_handler(CallbackQueryHandler(hour_notif_menu, pattern='^[0-9]+$'))
+        dp.add_handler(CallbackQueryHandler(mins_notif_menu, pattern='^m[0-9]+|mback$'))
 
         # For inline queries
         dp.add_handler(InlineQueryHandler(inlinequeries))
@@ -126,6 +117,7 @@ class WeatherBot:
                                  text="I didn't get your request. You can choose an action:",
                                  reply_markup=REPLY_MARKUP)
 
+    # This function is only for development purposes, you can call from bot with commad /get ...
     def get(self, update, context):
         chat_id = str(update.message.chat_id)
         key = update.message.text.partition(' ')[2]
