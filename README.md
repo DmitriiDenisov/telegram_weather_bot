@@ -3,7 +3,7 @@
 ## Bot:
 @weather_fcst_bot
 
-**Direct link: **
+### Direct link:
 https://t.me/weather_fcst_bot
 
 ## How to Run:
@@ -25,21 +25,21 @@ https://t.me/weather_fcst_bot
 ## Screenshots:
 
 <p align="center">
-  <img src="https://i.ibb.co/kGH6d6k/Screen-Shot-2020-06-02-at-10-56-28-PM.png" width="700" alt="accessibility text">
+  <img src="https://i.ibb.co/kGH6d6k/Screen-Shot-2020-06-02-at-10-56-28-PM.png" width="800" alt="accessibility text">
 </p>
 
 <p align="center">
-  <img src="https://i.ibb.co/9twLTsw/Screen-Shot-2020-06-02-at-10-57-02-PM.png" width="700" alt="accessibility text">
+  <img src="https://i.ibb.co/9twLTsw/Screen-Shot-2020-06-02-at-10-57-02-PM.png" width="800" alt="accessibility text">
 </p>
 
 <p align="center">
-  <img src="https://i.ibb.co/DLT5D0p/Screen-Shot-2020-06-02-at-10-57-13-PM.png" width="700" alt="accessibility text">
+  <img src="https://i.ibb.co/DLT5D0p/Screen-Shot-2020-06-02-at-10-57-13-PM.png" width="800" alt="accessibility text">
 </p>
 
 <p align="center">
-  <img src="https://i.ibb.co/8Mt6jKG/Screen-Shot-2020-06-02-at-10-57-27-PM.png" width="700" alt="accessibility text">
+  <img src="https://i.ibb.co/8Mt6jKG/Screen-Shot-2020-06-02-at-10-57-27-PM.png" width="800" alt="accessibility text">
 </p>
 
 <p align="center">
-  <img src="https://i.ibb.co/wWgMPHY/Screen-Shot-2020-06-02-at-10-57-41-PM.png" width="700" alt="accessibility text">
+  <img src="https://i.ibb.co/wWgMPHY/Screen-Shot-2020-06-02-at-10-57-41-PM.png" width="800" alt="accessibility text">
 </p>
