@@ -1,5 +1,11 @@
 # telegram_weather_bot
 
+## Bot:
+@weather_fcst_bot
+
+**Direct link: **
+https://t.me/weather_fcst_bot
+
 ## How to Run:
 
 1. Clone repo 
@@ -15,3 +21,34 @@
 6. In root directory create file `tokens.json`, put there json with four fileds: telegram, one_call, google, curr_weather (token for one_call and curr_weather will be equal)
 
 7. `python3 WeatherBot.py`
+
+## Screenshots:
+
+
+
+
+
+
+<p align="center">
+  <img src="https://ibb.co/Kjsj85J" width="900" alt="accessibility text">
+</p>
+
+<p align="center">
+  <img src="https://ibb.co/yNfB3BG" width="900" alt="accessibility text">
+</p>
+
+<p align="center">
+  <img src="https://ibb.co/0tBSMhB" width="900" alt="accessibility text">
+</p>
+
+<p align="center">
+  <img src="https://ibb.co/FnCgbRV" width="900" alt="accessibility text">
+</p>
+
+<p align="center">
+  <img src="https://ibb.co/wyjMK08" width="900" alt="accessibility text">
+</p>
+
+<p align="center">
+  <img src="https://ibb.co/tsK8vf3" width="900" alt="accessibility text">
+</p>
