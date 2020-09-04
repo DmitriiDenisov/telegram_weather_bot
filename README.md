@@ -18,7 +18,15 @@ https://t.me/weather_fcst_bot
 
 5. Go to `https://home.openweathermap.org/api_keys` and find your token for Open Weather provider
 
-6. In root directory create file `tokens.json`, put there json with four fileds: telegram, one_call, google, curr_weather (token for one_call and curr_weather will be equal)
+6. In root directory create file `tokens.json`, put there json with four fileds: telegram, one_call, google, curr_weather (token for one_call and curr_weather will be equal). In format like here: 
+```
+{
+  "telegram": "ABC",
+  "one_call": "ABC",
+  "curr_weather": "ABC",
+  "google": "ABC"
+}
+```
 
 7. `python3 WeatherBot.py`
 
