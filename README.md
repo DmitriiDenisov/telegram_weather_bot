@@ -21,10 +21,10 @@ https://t.me/weather_fcst_bot
 6. In root directory create file `tokens.json`, put there json with four fileds: telegram, one_call, google, curr_weather (token for one_call and curr_weather will be equal). In format like here: 
 ```
 {
-  "telegram": "ABC",
-  "one_call": "ABC",
-  "curr_weather": "ABC",
-  "google": "ABC"
+  "telegram": "ABC", // Telegram Bot Token
+  "one_call": "ABC", // Token from https://openweathermap.org/. It does not provide current weather that's why need separate for current weather
+  "curr_weather": "ABC", // token for weather
+  "google": "ABC" // token for Google location identifier 
 }
 ```
 
